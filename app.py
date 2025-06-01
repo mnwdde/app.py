@@ -1,4 +1,5 @@
 import os
+import asyncio
 import aiohttp  # async HTTP requests
 from flask import Flask, request
 from telegram import Update
@@ -53,9 +54,10 @@ def index():
     return "Bot is running!"
 
 @app.route('/webhook', methods=['POST'])
-async def webhook():
+def webhook():
     update = Update.de_json(request.get_json(force=True), app.bot)
-    await app.application.process_update(update)
+    # Run async bot update processing in sync route
+    asyncio.run(app.application.process_update(update))
     return "OK"
 
 # === Main section to start the bot and Flask app ===
